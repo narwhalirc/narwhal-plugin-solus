@@ -1,0 +1,14 @@
+Description = "Solus plugin for the Narwhal IRC bot."
+License = "Apache-2.0"
+Name = "Narwhal Solus Plugin"
+Version = 0.1
+
+[Projects]
+	[Projects.solusplugin]
+		ConsolidateChildDirs = false
+        DisableNestedEnvironment = true
+		Destination = "build/solusplugin.so"
+        EnableGoModules = true
+		Plugin = "go"
+		Source = "*.go"
+		Type = "plugin"

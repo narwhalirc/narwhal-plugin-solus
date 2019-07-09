@@ -4,10 +4,10 @@ Name = "Narwhal Solus Plugin"
 Version = 0.1
 
 [Projects]
-	[Projects.solusplugin]
+	[Projects.plugin]
 		ConsolidateChildDirs = false
         DisableNestedEnvironment = true
-		Destination = "build/solusplugin.so"
+		Destination = "build/solus.so"
         EnableGoModules = true
 		Plugin = "go"
 		Source = "*.go"

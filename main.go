@@ -5,23 +5,35 @@ import (
 	"github.com/JoshStrobl/trunk"
 	"github.com/lrstanley/girc"
 	"github.com/narwhalirc/tusk"
+	"regexp"
 	"strings"
 	"time"
 )
 
-func Parse(c *girc.Client, e girc.Event, m tusk.NarwhalMessage) {
-	cleanCommand := strings.Replace(m.Message, ".", "", 1)
+const devTopicFormat = `Solus Development\s\|\sStable:\sSynced\s\(Last on ([0-9A-Za-z:\-\+]+)\)\s\|\sUnstable:.+$`
 
-	if !strings.HasPrefix(m.Message, ".") { // Only accept messages which start with . (commands)
-		return
+var lastSynced string
+
+func Parse(c *girc.Client, e girc.Event, m tusk.NarwhalMessage) {
+	if lastSynced == "" { // Last Synced is not set yet
+		lastSynced = GetLastSynced(c) // Get our last synced timestamp
 	}
+
+	if strings.HasPrefix(m.Message, ".") { // Is a command
+		Command(c, e, m)
+	}
+}
+
+// Commands will handle any issued commands for the Solus plugin
+func Command(c *girc.Client, e girc.Event, m tusk.NarwhalMessage) {
+	cleanCommand := strings.Replace(m.Message, ".", "", 1)
 
 	switch cleanCommand { // Anyone can use these
 	case "budgie": // Budgie (Generic Info)
 		c.Cmd.Reply(e,
 			`Budgie, our flagship desktop environment, is made available over at https://github.com/solus-project/budgie-desktop. 
-If you have an issue with Budgie, please go to its dedicated issue tracker and file an issue, so we can work towards addressing it for all of our users!
-			`)
+	If you have an issue with Budgie, please go to its dedicated issue tracker and file an issue, so we can work towards addressing it for all of our users!
+				`)
 	case "contribute", "getinvolved": // Get Involved
 		c.Cmd.Reply(e, "We always love more contributions from even more people! If you want to contribute to Solus, we'd love for you to check out https://getsol.us/articles/contributing/getting-involved/en/")
 	case "dev", "phab": // Link our Development Tracker
@@ -34,6 +46,9 @@ If you have an issue with Budgie, please go to its dedicated issue tracker and f
 		c.Cmd.Reply(e, "Solus uses its own, unique, package manager called eopkg. To learn about package management on Solus, go to https://getsol.us/articles/package-management/")
 	case "eta": // We don't give them
 		c.Cmd.Reply(e, "Solus does not provide ETAs. It's ready when it's ready.")
+	case "lastsynced": // Get our last synced
+		lastSynced = GetLastSynced(c) // Ensure we have the most updated sync timestamp
+		c.Cmd.Reply(e, "We last performed a sync to the stable repository on "+lastSynced)
 	case "facebook": // Link to our Facebook
 		c.Cmd.Reply(e, "Solus has a Facebook account at https://facebook.com/get.solus")
 	case "flarum", "forums": // Link to our Forums
@@ -61,8 +76,43 @@ If you have an issue with Budgie, please go to its dedicated issue tracker and f
 			c.Cmd.Topic(m.Channel, "Solus Development | Stable: Syncing | Unstable: Frozen")
 		case "synced": // Just synced
 			SetToSynced(c, m)
+		case "unstablemsg": // Update our unstable message
+			SetUnstableMsg(c, m)
 		}
 	}
+}
+
+// GetLastSynced will get the last synced ISO 8601 string
+func GetLastSynced(c *girc.Client) string {
+	var regexr *regexp.Regexp
+	var getErr error
+	var lastSyncedFound string
+
+	if regexr, getErr = regexp.Compile(devTopicFormat); getErr == nil { // Did not fail to compile our regex
+		if !c.IsInChannel("#Solus-Dev") { // If we're not in #Solus-Dev, which we need to be to perform lookup
+			c.Cmd.Join("#Solus-Dev") // Join first
+		}
+
+		if channel := c.LookupChannel("#Solus-Dev"); channel != nil { // Successfully performed channel lookup
+			matches := regexr.FindStringSubmatch(channel.Topic) // Find our string submatch
+
+			if len(matches) == 2 { // If we have both the topic and our match
+				lastSyncedFound = matches[1] // Get our match
+			} else {
+				trunk.LogErr(fmt.Sprintf("Failed to get last synced date. Matches found: %v", matches))
+			}
+		} else {
+			trunk.LogErr("Failed to look up #Solus-Dev channel")
+		}
+	} else { // Failed to compile our regex
+		trunk.LogErr("Failed to parse our last synced regex: " + getErr.Error())
+	}
+
+	if getErr != nil || lastSyncedFound == "" { // Failed during some point, whether during regex or lookups
+		lastSyncedFound = "some point recently"
+	}
+
+	return lastSyncedFound
 }
 
 // SetToSynced will set our topic to our synced message
@@ -73,4 +123,12 @@ func SetToSynced(c *girc.Client, m tusk.NarwhalMessage) {
 
 	trunk.LogInfo(fmt.Sprintf("%s performed a sync on %s and updated the topic", m.Issuer, nowISO))
 	c.Cmd.Topic(m.Channel, fmt.Sprintf("Solus Development | Stable: Synced (Last on %s) | Unstable: Unfrozen", nowISO))
+}
+
+// Set the unstable portion of our #Solus-Dev topic
+func SetUnstableMsg(c *girc.Client, m tusk.NarwhalMessage) {
+	lastSynced = GetLastSynced(c) // Ensure our lastSynced is up-to-date
+	newTopic := fmt.Sprintf("Solus Development | Stable: Synced (Last on %s) | Unstable: %s", lastSynced, m.MessageNoCmd)
+	trunk.LogInfo(fmt.Sprintf("%s updated the topic for %s to: %s", m.Issuer, m.Channel, newTopic))
+	c.Cmd.Topic(m.Channel, newTopic)
 }

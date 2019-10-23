@@ -34,6 +34,8 @@ func Command(c *girc.Client, e girc.Event, m tusk.NarwhalMessage) {
 			`Budgie, our flagship desktop environment, is made available over at https://github.com/solus-project/budgie-desktop. 
 	If you have an issue with Budgie, please go to its dedicated issue tracker and file an issue, so we can work towards addressing it for all of our users!
 				`)
+	case "bug", "bugs": // Bugs
+		c.Cmd.Reply(e, "We have a development tracker where bug reports can be filed. Please visit https://dev.getsol.us")
 	case "contribute", "getinvolved": // Get Involved
 		c.Cmd.Reply(e, "We always love more contributions from even more people! If you want to contribute to Solus, we'd love for you to check out https://getsol.us/articles/contributing/getting-involved/en/")
 	case "dev", "phab": // Link our Development Tracker
@@ -52,7 +54,7 @@ func Command(c *girc.Client, e girc.Event, m tusk.NarwhalMessage) {
 	case "facebook": // Link to our Facebook
 		c.Cmd.Reply(e, "Solus has a Facebook account at https://facebook.com/get.solus")
 	case "flarum", "forums": // Link to our Forums
-		c.Cmd.Reply(e, "We have forums available to discuss a wide range of topics. Feel free to check it out at https://dev.getsol.us. You can sign in with your Dev Tracker or GitHub account!")
+		c.Cmd.Reply(e, "We have forums available to discuss a wide range of topics. Feel free to check it out at https://discuss.getsol.us. You can sign in with your Dev Tracker or GitHub account!")
 	case "guidelines", "rules": // Link to our Community Guidelines
 		c.Cmd.Reply(e, "Solus always aims to provide a friendly, healthy environment for all users. Please ensure you read and follow our Community Guidelines, which can be found at https://getsol.us/articles/contributing/community-guidelines/en/")
 		c.Cmd.Reply(e, "In the event you have a concern or issue with another member of our community, please reach out to a member of the Core Team immediately.")
@@ -120,14 +122,14 @@ func SetToSynced(c *girc.Client, m tusk.NarwhalMessage) {
 	isoFormat := "2006-01-02T15:04:05-07:00"
 	now := time.Now()
 	nowISO := now.Format(isoFormat)
+	lastSynced = nowISO // Update lastSynced
 
 	trunk.LogInfo(fmt.Sprintf("%s performed a sync on %s and updated the topic", m.Issuer, nowISO))
-	c.Cmd.Topic(m.Channel, fmt.Sprintf("Solus Development | Stable: Synced (Last on %s) | Unstable: Unfrozen", nowISO))
+	c.Cmd.Topic(m.Channel, fmt.Sprintf("Solus Development | Stable: Synced (Last on %s) | Unstable: Unfrozen", lastSynced))
 }
 
 // Set the unstable portion of our #Solus-Dev topic
 func SetUnstableMsg(c *girc.Client, m tusk.NarwhalMessage) {
-	lastSynced = GetLastSynced(c) // Ensure our lastSynced is up-to-date
 	newTopic := fmt.Sprintf("Solus Development | Stable: Synced (Last on %s) | Unstable: %s", lastSynced, m.MessageNoCmd)
 	trunk.LogInfo(fmt.Sprintf("%s updated the topic for %s to: %s", m.Issuer, m.Channel, newTopic))
 	c.Cmd.Topic(m.Channel, newTopic)

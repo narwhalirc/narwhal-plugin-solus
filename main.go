@@ -15,7 +15,7 @@ const devTopicFormat = `Solus Development\s\|\sStable:\sSynced\s\(Last on ([0-9A
 var lastSynced string
 
 func Parse(c *girc.Client, e girc.Event, m tusk.NarwhalMessage) {
-	if lastSynced == "" { // Last Synced is not set yet
+	if (lastSynced == "") || (lastSynced == "some point recently") { // Last Synced is not set yet
 		lastSynced = GetLastSynced(c) // Get our last synced timestamp
 	}
 
@@ -47,9 +47,8 @@ func Command(c *girc.Client, e girc.Event, m tusk.NarwhalMessage) {
 	case "eopkg": // Link to our package manager documentation
 		c.Cmd.Reply(e, "Solus uses its own, unique, package manager called eopkg. To learn about package management on Solus, go to https://getsol.us/articles/package-management/")
 	case "eta": // We don't give them
-		c.Cmd.Reply(e, "Solus does not provide ETAs. It's ready when it's ready.")
+		c.Cmd.Reply(e, "Solus 4.2 is slated for 2020-03-23T12:00:00+02:00. See https://dev.getsol.us/T8629")
 	case "lastsynced": // Get our last synced
-		lastSynced = GetLastSynced(c) // Ensure we have the most updated sync timestamp
 		c.Cmd.Reply(e, "We last performed a sync to the stable repository on "+lastSynced)
 	case "facebook": // Link to our Facebook
 		c.Cmd.Reply(e, "Solus has a Facebook account at https://facebook.com/get.solus")

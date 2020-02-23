@@ -1,5 +1,5 @@
 module solusplugin
 
-go 1.12
+go 1.13
 
-require github.com/narwhalirc/tusk v0.0.0-20200203214700-8eaa58e026a3 // indirect
+require github.com/narwhalirc/tusk v0.0.0-20200223094303-6b544e463b43 // indirect

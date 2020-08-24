@@ -2,4 +2,4 @@ module solusplugin
 
 go 1.15
 
-require github.com/narwhalirc/tusk v0.0.0-20200824204318-573f4932fd83 // indirect
+require github.com/narwhalirc/tusk v0.0.0-20200824205128-85616906ec59 // indirect

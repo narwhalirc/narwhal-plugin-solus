@@ -6,9 +6,10 @@ Version = 0.1
 [Projects]
 	[Projects.plugin]
 		ConsolidateChildDirs = false
-        DisableNestedEnvironment = true
+		DisableNestedEnvironment = true
 		Destination = "build/solus.so"
-        EnableGoModules = true
+		EnableGoModules = true
 		Plugin = "go"
+		Private = ["github.com"] # Ignore github.com caching since updating against tusk can be time sensitive
 		Source = "*.go"
 		Type = "plugin"

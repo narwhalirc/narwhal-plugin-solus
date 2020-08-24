@@ -47,7 +47,7 @@ func Command(c *girc.Client, e girc.Event, m tusk.NarwhalMessage) {
 	case "eopkg": // Link to our package manager documentation
 		c.Cmd.Reply(e, "Solus uses its own, unique, package manager called eopkg. To learn about package management on Solus, go to https://getsol.us/articles/package-management/")
 	case "eta": // We don't give them
-		c.Cmd.Reply(e, "Solus 4.2 is slated for 2020-03-23T12:00:00+02:00. See https://dev.getsol.us/T8629")
+		c.Cmd.Reply(e, "We don't give ETAs.")
 	case "lastsynced": // Get our last synced
 		c.Cmd.Reply(e, "We last performed a sync to the stable repository on "+lastSynced)
 	case "facebook": // Link to our Facebook
@@ -63,8 +63,6 @@ func Command(c *girc.Client, e girc.Event, m tusk.NarwhalMessage) {
 		c.Cmd.Reply(e, "Want to get started with packaging under Solus? Check out https://getsol.us/articles/packaging/")
 	case "reddit": // Link to our sub-reddit
 		c.Cmd.Reply(e, "Solus has its own subreddit at https://reddit.com/r/SolusProject")
-	case "roadmap": // Link to our Roadmap
-		c.Cmd.Reply(e, "Solus has a dedicated Roadmap page where you can find out what our short-term and long-term plans are, available at https://getsol.us/solus/roadmap/")
 	case "social": // General Social Response
 		c.Cmd.Reply(e, "Solus has a multitude of accounts across various social networks and mediums. You can see all the places we are at by going to https://getsol.us/articles/contributing/getting-involved/en/#social-media")
 	case "twitter": // Link to our Twitter

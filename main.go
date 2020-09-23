@@ -48,6 +48,8 @@ func Command(c *girc.Client, e girc.Event, m tusk.NarwhalMessage) {
 		c.Cmd.Reply(e, "Solus uses its own, unique, package manager called eopkg. To learn about package management on Solus, go to https://getsol.us/articles/package-management/")
 	case "eta": // We don't give them
 		c.Cmd.Reply(e, "We don't give ETAs.")
+	case "faq": // FAQ
+		c.Cmd.Reply(e, "We have a short FAQ available at https://discuss.getsol.us/d/2772-solus-faq")
 	case "lastsynced": // Get our last synced
 		c.Cmd.Reply(e, "We last performed a sync to the stable repository on "+lastSynced)
 	case "facebook": // Link to our Facebook

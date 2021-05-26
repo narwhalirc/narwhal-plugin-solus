@@ -59,6 +59,8 @@ func Command(c *girc.Client, e girc.Event, m tusk.NarwhalMessage) {
 	case "guidelines", "rules": // Link to our Community Guidelines
 		c.Cmd.Reply(e, "Solus always aims to provide a friendly, healthy environment for all users. Please ensure you read and follow our Community Guidelines, which can be found at https://getsol.us/articles/contributing/community-guidelines/en/")
 		c.Cmd.Reply(e, "In the event you have a concern or issue with another member of our community, please reach out to a member of the Core Team immediately.")
+	case "libera": // Libera
+		c.Cmd.Reply(e, "We are available on Libera IRC. Same channels, different server!")
 	case "mastodon": // Link to our Mastodon
 		c.Cmd.Reply(e, "Solus has a Mastodon account at https://mastodon.cloud/@SolusProject")
 	case "packaging": //  Packaging Documentation
